@@ -1,0 +1,23 @@
+{
+  "name": "smartmenu",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=apps/api\" \"npm run dev --workspace=apps/web-customer\" \"npm run dev --workspace=apps/web-admin\"",
+    "dev:api": "npm run dev --workspace=apps/api",
+    "dev:customer": "npm run dev --workspace=apps/web-customer",
+    "dev:admin": "npm run dev --workspace=apps/web-admin",
+    "build": "npm run build --workspaces",
+    "db:migrate": "npm run db:migrate --workspace=apps/api",
+    "db:seed": "npm run db:seed --workspace=apps/api",
+    "db:studio": "npm run db:studio --workspace=apps/api"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.3.3"
+  }
+}
