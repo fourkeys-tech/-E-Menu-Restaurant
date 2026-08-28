@@ -4,7 +4,6 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "SmartMenu — Digital E-Menu",
   description: "Pesan makanan & minuman langsung dari meja Anda tanpa antre.",
-  manifest: "/manifest.json",
   themeColor: "#1A1A1A",
 };
 
