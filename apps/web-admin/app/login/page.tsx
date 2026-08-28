@@ -90,7 +90,7 @@ export default function LoginPage() {
 
           {/* Link to Front Page */}
           <div style={{ marginTop: 20, textAlign: "center" }}>
-            <a href="http://localhost:3000" style={{ color: "var(--primary)", fontSize: 14, fontWeight: 600, textDecoration: "none", display: "inline-block", padding: "8px 16px", borderRadius: "var(--radius-sm)", background: "var(--surface-2)", transition: "all 0.2s" }}>
+            <a href={process.env.NEXT_PUBLIC_CUSTOMER_URL || "http://localhost:3000"} style={{ color: "var(--primary)", fontSize: 14, fontWeight: 600, textDecoration: "none", display: "inline-block", padding: "8px 16px", borderRadius: "var(--radius-sm)", background: "var(--surface-2)", transition: "all 0.2s" }}>
               ← Kembali ke Halaman Pelanggan
             </a>
           </div>
