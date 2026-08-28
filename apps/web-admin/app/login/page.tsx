@@ -88,12 +88,11 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Demo hints */}
-          <div style={{ marginTop: 20, padding: "12px 14px", background: "var(--surface-2)", borderRadius: "var(--radius-sm)" }}>
-            <p style={{ fontSize: 12, fontWeight: 600, marginBottom: 6, color: "var(--text-secondary)" }}>Demo Credentials:</p>
-            <p style={{ fontSize: 12, color: "var(--text-secondary)" }}>Admin: admin@kafenusantara.id / admin123</p>
-            <p style={{ fontSize: 12, color: "var(--text-secondary)" }}>Kasir: kasir@kafenusantara.id / kasir123</p>
-            <p style={{ fontSize: 12, color: "var(--text-secondary)" }}>Chef: chef@kafenusantara.id / chef123</p>
+          {/* Link to Front Page */}
+          <div style={{ marginTop: 20, textAlign: "center" }}>
+            <a href="http://localhost:3000" style={{ color: "var(--primary)", fontSize: 14, fontWeight: 600, textDecoration: "none", display: "inline-block", padding: "8px 16px", borderRadius: "var(--radius-sm)", background: "var(--surface-2)", transition: "all 0.2s" }}>
+              ← Kembali ke Halaman Pelanggan
+            </a>
           </div>
         </div>
       </div>

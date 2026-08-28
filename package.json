@@ -8,6 +8,8 @@
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace=apps/api\" \"npm run dev --workspace=apps/web-customer\" \"npm run dev --workspace=apps/web-admin\"",
+    "dev:api-customer": "concurrently \"npm run dev --workspace=apps/api\" \"npm run dev --workspace=apps/web-customer\"",
+    "dev:api-admin": "concurrently \"npm run dev --workspace=apps/api\" \"npm run dev --workspace=apps/web-admin\"",
     "dev:api": "npm run dev --workspace=apps/api",
     "dev:customer": "npm run dev --workspace=apps/web-customer",
     "dev:admin": "npm run dev --workspace=apps/web-admin",
