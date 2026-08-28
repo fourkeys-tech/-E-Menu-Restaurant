@@ -78,23 +78,26 @@ export default function TrackingPage(props: { params: Promise<{ restaurantSlug: 
     loadOrder();
 
     // Socket.io for real-time updates
-    const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001");
-    socketRef.current = socket;
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
+    if (socketUrl) {
+      const socket = io(socketUrl);
+      socketRef.current = socket as any;
 
-    socket.on("connect", () => {
-      socket.emit("join:order", orderId);
-      if (order?.restaurant) {
-        socket.emit("join:restaurant", order.restaurant);
-      }
-    });
+      socket.on("connect", () => {
+        socket.emit("join:order", orderId);
+        if (order?.restaurant) {
+          socket.emit("join:restaurant", order.restaurant);
+        }
+      });
 
-    socket.on("order:status_updated", (data: any) => {
-      if (data.orderId === orderId) {
-        loadOrder();
-      }
-    });
+      socket.on("order:status_updated", (data: any) => {
+        if (data.orderId === orderId) {
+          loadOrder();
+        }
+      });
 
-    return () => { socket.disconnect(); };
+      return () => { socket.disconnect(); };
+    }
   }, [orderId]);
 
   const currentIndex = order ? STATUS_INDEX[order.status] ?? 0 : 0;
