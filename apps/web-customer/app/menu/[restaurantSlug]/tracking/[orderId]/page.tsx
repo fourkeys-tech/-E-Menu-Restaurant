@@ -217,7 +217,7 @@ export default function TrackingPage(props: { params: Promise<{ restaurantSlug: 
               </div>
             );
           })}
-          
+
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
             <span style={{ fontSize: 14, color: "var(--text-secondary)" }}>Subtotal</span>
             <span style={{ fontSize: 14, fontWeight: 600 }}>{formatRupiah(order.subtotal)}</span>
@@ -240,9 +240,9 @@ export default function TrackingPage(props: { params: Promise<{ restaurantSlug: 
               <span style={{ fontSize: 14, fontWeight: 600 }}>{formatRupiah(order.serviceCharge)}</span>
             </div>
           )}
-          
+
           <div style={{ height: 1, background: "var(--border)", marginBottom: 10 }} />
-          
+
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Total</span>
             <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 16, color: "var(--primary)" }}>{formatRupiah(order.total)}</span>
