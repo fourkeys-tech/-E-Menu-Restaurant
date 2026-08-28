@@ -63,7 +63,7 @@ router.get('/:restaurantSlug/menu', async (req: Request, res: Response, next: Ne
       },
     });
 
-    const parsedCategories = filteredCategories.map(cat => ({
+    const parsedCategories = filteredCategories.map((cat: any) => ({
       ...cat,
       menuItems: (cat as any).menuItems.map((item: any) => ({
         ...item,

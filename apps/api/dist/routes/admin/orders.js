@@ -40,13 +40,14 @@ router.get('/', async (req, res, next) => {
                     cashier: { select: { name: true } },
                     chef: { select: { name: true } },
                     customer: { select: { phone: true } },
+                    promotion: { select: { name: true } },
                 },
             }),
             prisma_1.default.order.count({ where }),
         ]);
-        const parsedOrders = orders.map(order => ({
+        const parsedOrders = orders.map((order) => ({
             ...order,
-            orderItems: order.orderItems.map(item => ({
+            orderItems: order.orderItems.map((item) => ({
                 ...item,
                 variantSelected: item.variantSelected ? JSON.parse(item.variantSelected) : null
             }))
@@ -107,6 +108,70 @@ router.delete('/:id', (0, auth_1.authorize)('admin', 'kasir'), async (req, res, 
             }
         });
         res.json({ success: true, message: 'Pesanan dibatalkan.' });
+    }
+    catch (err) {
+        next(err);
+    }
+});
+// PATCH /api/admin/orders/:id/promo - Apply or remove promo
+router.patch('/:id/promo', (0, auth_1.authorize)('admin', 'kasir'), async (req, res, next) => {
+    try {
+        const { promotionId } = req.body;
+        const order = await prisma_1.default.order.findUnique({ where: { id: req.params.id } });
+        if (!order)
+            throw new errorHandler_1.AppError('Pesanan tidak ditemukan.', 404);
+        if (order.paymentStatus === 'paid')
+            throw new errorHandler_1.AppError('Pesanan sudah dibayar.', 400);
+        let discountAmount = 0;
+        if (promotionId) {
+            const promo = await prisma_1.default.promotion.findUnique({ where: { id: promotionId } });
+            if (!promo || !promo.isActive)
+                throw new errorHandler_1.AppError('Promo tidak valid atau sudah tidak aktif', 400);
+            if (promo.restaurantId !== order.restaurantId)
+                throw new errorHandler_1.AppError('Promo tidak valid', 400);
+            if (promo.minOrderAmount && order.subtotal < promo.minOrderAmount) {
+                throw new errorHandler_1.AppError(`Minimal pesanan untuk promo ini adalah Rp ${promo.minOrderAmount}`, 400);
+            }
+            const now = new Date();
+            if (promo.startDate && now < promo.startDate)
+                throw new errorHandler_1.AppError('Promo belum dimulai', 400);
+            if (promo.endDate && now > promo.endDate)
+                throw new errorHandler_1.AppError('Promo sudah kadaluarsa', 400);
+            if (promo.maxUsage && order.promotionId !== promo.id) {
+                const usageCount = await prisma_1.default.order.count({
+                    where: { promotionId: promo.id, status: { not: 'cancelled' } }
+                });
+                if (usageCount >= promo.maxUsage) {
+                    throw new errorHandler_1.AppError('Batas penggunaan kode promo telah habis', 400);
+                }
+            }
+            if (promo.discountType === 'PERCENT') {
+                discountAmount = order.subtotal * (promo.discountValue / 100);
+                if (promo.maxDiscount && discountAmount > promo.maxDiscount) {
+                    discountAmount = promo.maxDiscount;
+                }
+            }
+            else {
+                discountAmount = promo.discountValue;
+            }
+        }
+        const amountAfterDiscount = Math.max(0, order.subtotal - discountAmount);
+        const taxAmount = amountAfterDiscount * 0.11;
+        const total = amountAfterDiscount + taxAmount + order.serviceCharge;
+        const updatedOrder = await prisma_1.default.order.update({
+            where: { id: req.params.id },
+            data: { promotionId: promotionId || null, discountAmount, taxAmount, total },
+            include: {
+                orderItems: { include: { menuItem: { select: { name: true, imageUrl: true } } } },
+                table: { select: { tableNumber: true, label: true } },
+                payment: true,
+                cashier: { select: { name: true } },
+                chef: { select: { name: true } },
+                customer: { select: { phone: true } },
+                promotion: true,
+            }
+        });
+        res.json({ success: true, data: updatedOrder, message: promotionId ? 'Promo berhasil dipasang' : 'Promo dihapus' });
     }
     catch (err) {
         next(err);

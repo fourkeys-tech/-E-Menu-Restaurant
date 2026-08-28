@@ -44,9 +44,9 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
       prisma.order.count({ where }),
     ]);
 
-    const parsedOrders = orders.map(order => ({
+    const parsedOrders = orders.map((order: any) => ({
       ...order,
-      orderItems: order.orderItems.map(item => ({
+      orderItems: order.orderItems.map((item: any) => ({
         ...item,
         variantSelected: item.variantSelected ? JSON.parse(item.variantSelected as string) : null
       }))

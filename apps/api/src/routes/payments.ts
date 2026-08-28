@@ -39,7 +39,7 @@ router.post('/midtrans/create', async (req: AuthRequest, res: Response, next: Ne
         order_id: order.orderNumber,
         gross_amount: Math.round(order.total),
       },
-      item_details: order.orderItems.map((oi) => ({
+      item_details: order.orderItems.map((oi: any) => ({
         id: oi.menuItemId,
         price: Math.round(oi.priceAtOrder),
         quantity: oi.quantity,

@@ -90,7 +90,7 @@ router.post('/close', async (req: AuthRequest, res: Response, next: NextFunction
       }
     });
 
-    const totalRevenue = payments.reduce((acc, p) => acc + p.amount, 0);
+    const totalRevenue = payments.reduce((acc: any, p: any) => acc + p.amount, 0);
     const expectedCash = shift.openingCash + totalRevenue;
     const actualClosingCash = Number(closingCash) || 0;
     const diff = actualClosingCash - expectedCash;

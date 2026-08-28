@@ -226,7 +226,7 @@ router.get('/:id/status', async (req: Request, res: Response, next: NextFunction
 
     const parsedOrder = {
       ...order,
-      orderItems: order.orderItems.map(item => ({
+      orderItems: order.orderItems.map((item: any) => ({
         ...item,
         variantSelected: item.variantSelected ? JSON.parse(item.variantSelected as string) : null
       }))

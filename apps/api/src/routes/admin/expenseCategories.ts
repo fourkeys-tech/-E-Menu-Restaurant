@@ -90,7 +90,7 @@ router.put('/:id', async (req: AuthRequest, res: Response, next: NextFunction) =
     const oldName = category.name;
 
     // Use transaction to update both category name and existing expenses
-    const updatedCategory = await prisma.$transaction(async (tx) => {
+    const updatedCategory = await prisma.$transaction(async (tx: any) => {
       const updated = await tx.expenseCategory.update({
         where: { id: req.params.id },
         data: { name },

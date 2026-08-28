@@ -34,12 +34,18 @@ router.post('/open', async (req, res, next) => {
         const restaurantId = req.user.restaurantId;
         const userId = req.user.id;
         const { openingCash } = req.body;
-        // Check if there's already an open shift
+        // Check if there's already an open shift in this restaurant by ANY user
         const existing = await prisma_1.default.shift.findFirst({
-            where: { restaurantId, userId, status: 'open' }
+            where: { restaurantId, status: 'open' },
+            include: { user: { select: { name: true } } }
         });
         if (existing) {
-            throw new errorHandler_1.AppError('Anda masih memiliki shift yang belum ditutup.', 400);
+            if (existing.userId === userId) {
+                throw new errorHandler_1.AppError('Anda masih memiliki shift yang belum ditutup.', 400);
+            }
+            else {
+                throw new errorHandler_1.AppError(`Kasir ${existing.user?.name || 'lain'} sedang aktif. Harap minta Kasir tersebut untuk menutup shift-nya terlebih dahulu.`, 400);
+            }
         }
         const shift = await prisma_1.default.shift.create({
             data: {

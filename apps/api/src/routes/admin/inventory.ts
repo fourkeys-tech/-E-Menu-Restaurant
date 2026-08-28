@@ -113,7 +113,7 @@ router.post('/:id/transaction', async (req: AuthRequest, res: Response, next: Ne
       throw new Error(`Stok tidak cukup. Sisa stok: ${item.currentStock} ${item.unit}`);
     }
 
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       // Create transaction record
       const trx = await tx.inventoryTransaction.create({
         data: {

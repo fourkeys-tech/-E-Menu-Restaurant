@@ -119,7 +119,7 @@ router.get('/sales', async (req: AuthRequest, res: Response, next: NextFunction)
       salesMap[key].revenue += order.total;
       salesMap[key].profit += order.total;
       salesMap[key].orders += 1;
-      salesMap[key].items += order.orderItems.reduce((sum, oi) => sum + oi.quantity, 0);
+      salesMap[key].items += order.orderItems.reduce((sum: any, oi: any) => sum + oi.quantity, 0);
     }
 
     for (const exp of expenses) {
@@ -142,10 +142,10 @@ router.get('/sales', async (req: AuthRequest, res: Response, next: NextFunction)
     const salesData = Object.entries(salesMap).map(([period, data]) => ({ period, ...data }));
 
     // Summary
-    const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
+    const totalRevenue = orders.reduce((sum: any, o: any) => sum + o.total, 0);
     const totalOrders = orders.length;
-    const totalItems = orders.reduce((sum, o) => sum + o.orderItems.reduce((s, oi) => s + oi.quantity, 0), 0);
-    const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+    const totalItems = orders.reduce((sum: any, o: any) => sum + o.orderItems.reduce((s: any, oi: any) => s + oi.quantity, 0), 0);
+    const totalExpenses = expenses.reduce((sum: any, e: any) => sum + e.amount, 0);
     const netProfit = totalRevenue - totalExpenses;
 
     res.json({
@@ -173,15 +173,15 @@ router.get('/top-items', requireAdmin, async (req: AuthRequest, res: Response, n
       take: parseInt(limit as string),
     });
 
-    const itemIds = topItems.map((i) => i.menuItemId);
+    const itemIds = topItems.map((i: any) => i.menuItemId);
     const menuItems = await prisma.menuItem.findMany({
       where: { id: { in: itemIds } },
       select: { id: true, name: true, price: true, imageUrl: true, category: { select: { name: true } } },
     });
 
-    const result = topItems.map((item) => ({
+    const result = topItems.map((item: any) => ({
       ...item,
-      menuItem: menuItems.find((m) => m.id === item.menuItemId),
+      menuItem: menuItems.find((m: any) => m.id === item.menuItemId),
     }));
 
     res.json({ success: true, data: result });

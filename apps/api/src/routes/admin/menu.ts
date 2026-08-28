@@ -82,7 +82,7 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
     const limit = parseInt(req.query.limit as string) || 10;
     const skip = (page - 1) * limit;
 
-    const whereClause = {
+    const whereClause: any = {
       restaurantId,
       ...(category ? { categoryId: category as string } : {}),
       ...(search ? { name: { contains: search as string, mode: 'insensitive' } } : {}),
@@ -100,7 +100,7 @@ router.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
       prisma.menuItem.count({ where: whereClause })
     ]);
 
-    const parsedItems = items.map(item => ({
+    const parsedItems = items.map((item: any) => ({
       ...item,
       variants: item.variants ? JSON.parse(item.variants as string) : null
     }));

@@ -89,6 +89,14 @@ router.post('/', async (req, res, next) => {
                 const validStart = promo.startDate ? now >= promo.startDate : true;
                 const validEnd = promo.endDate ? now <= promo.endDate : true;
                 if (validStart && validEnd) {
+                    if (promo.maxUsage) {
+                        const usageCount = await prisma_1.default.order.count({
+                            where: { promotionId: promo.id, status: { not: 'cancelled' } }
+                        });
+                        if (usageCount >= promo.maxUsage) {
+                            throw new errorHandler_1.AppError('Batas penggunaan kode promo telah habis', 400);
+                        }
+                    }
                     promotionId = promo.id;
                     if (promo.discountType === 'PERCENT') {
                         discountAmount = subtotal * (promo.discountValue / 100);
@@ -201,13 +209,14 @@ router.get('/:id/status', async (req, res, next) => {
                 table: { select: { tableNumber: true, label: true } },
                 restaurant: { select: { name: true, logoUrl: true, primaryColor: true, accentColor: true } },
                 payment: true,
+                promotion: { select: { name: true } },
             },
         });
         if (!order)
             throw new errorHandler_1.AppError('Pesanan tidak ditemukan.', 404);
         const parsedOrder = {
             ...order,
-            orderItems: order.orderItems.map(item => ({
+            orderItems: order.orderItems.map((item) => ({
                 ...item,
                 variantSelected: item.variantSelected ? JSON.parse(item.variantSelected) : null
             }))

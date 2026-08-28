@@ -9,17 +9,42 @@ const prisma_1 = __importDefault(require("../../lib/prisma"));
 const auth_1 = require("../../middlewares/auth");
 const router = (0, express_1.Router)();
 router.use(auth_1.authenticate);
-router.use((0, auth_1.authorize)('admin')); // Only Admin can manage promos
 const promotionSchema = zod_1.z.object({
     code: zod_1.z.string().min(3).toUpperCase(),
     discountType: zod_1.z.enum(['PERCENT', 'FIXED']),
     discountValue: zod_1.z.number().min(0.1),
     startDate: zod_1.z.string().datetime().optional().nullable(),
     endDate: zod_1.z.string().datetime().optional().nullable(),
+    maxUsage: zod_1.z.number().int().min(1).optional().nullable(),
     isActive: zod_1.z.boolean().default(true),
 });
+// GET /api/admin/promotions/active
+router.get('/active', (0, auth_1.authorize)('admin', 'kasir'), async (req, res, next) => {
+    try {
+        const restaurantId = req.user.restaurantId;
+        const now = new Date();
+        const promos = await prisma_1.default.promotion.findMany({
+            where: {
+                restaurantId,
+                isActive: true,
+                OR: [
+                    { startDate: null },
+                    { startDate: { lte: now } }
+                ],
+                AND: [
+                    { OR: [{ endDate: null }, { endDate: { gte: now } }] }
+                ]
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+        res.json({ success: true, data: promos });
+    }
+    catch (err) {
+        next(err);
+    }
+});
 // GET /api/admin/promotions
-router.get('/', async (req, res, next) => {
+router.get('/', (0, auth_1.authorize)('admin'), async (req, res, next) => {
     try {
         const restaurantId = req.user.restaurantId;
         const page = parseInt(req.query.page) || 1;
@@ -31,7 +56,9 @@ router.get('/', async (req, res, next) => {
                 orderBy: { createdAt: 'desc' },
                 include: {
                     _count: {
-                        select: { orders: true }
+                        select: {
+                            orders: { where: { status: { not: 'cancelled' } } }
+                        }
                     }
                 },
                 skip,
@@ -50,7 +77,7 @@ router.get('/', async (req, res, next) => {
     }
 });
 // POST /api/admin/promotions
-router.post('/', async (req, res, next) => {
+router.post('/', (0, auth_1.authorize)('admin'), async (req, res, next) => {
     try {
         const restaurantId = req.user.restaurantId;
         const data = promotionSchema.parse(req.body);
@@ -76,7 +103,7 @@ router.post('/', async (req, res, next) => {
     }
 });
 // PUT /api/admin/promotions/:id
-router.put('/:id', async (req, res, next) => {
+router.put('/:id', (0, auth_1.authorize)('admin'), async (req, res, next) => {
     try {
         const restaurantId = req.user.restaurantId;
         const data = promotionSchema.parse(req.body);
@@ -107,7 +134,7 @@ router.put('/:id', async (req, res, next) => {
     }
 });
 // DELETE /api/admin/promotions/:id
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', (0, auth_1.authorize)('admin'), async (req, res, next) => {
     try {
         const restaurantId = req.user.restaurantId;
         const promotion = await prisma_1.default.promotion.findUnique({

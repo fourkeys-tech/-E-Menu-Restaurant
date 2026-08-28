@@ -104,7 +104,7 @@ router.get('/', async (req, res, next) => {
             }),
             prisma_1.default.menuItem.count({ where: whereClause })
         ]);
-        const parsedItems = items.map(item => ({
+        const parsedItems = items.map((item) => ({
             ...item,
             variants: item.variants ? JSON.parse(item.variants) : null
         }));
