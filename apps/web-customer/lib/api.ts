@@ -54,9 +54,11 @@ export interface Order {
   paymentStatus: string;
   paymentMethod: string;
   subtotal: number;
+  discountAmount: number;
   taxAmount: number;
   serviceCharge: number;
   total: number;
+  promotion?: { name: string };
   createdAt: string;
   table?: { tableNumber: string; label?: string };
   restaurant: { name: string; logoUrl?: string; primaryColor: string; accentColor: string };
