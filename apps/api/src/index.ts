@@ -82,6 +82,11 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), service: 'SmartMenu API' });
 });
 
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ message: 'Welcome to SmartMenu API', status: 'running' });
+});
+
 // ==================== Error Handling ====================
 app.use(notFound);
 app.use(errorHandler);
