@@ -18,41 +18,7 @@ const STATUS_INDEX: Record<string, number> = {
   pending: 0, cooking: 1, ready: 2, served: 3, completed: 3,
 };
 
-function StatusStep({ step, index, currentIndex }: { step: typeof ORDER_STATUSES[0]; index: number; currentIndex: number }) {
-  const isDone = index <= currentIndex;
-  const isActive = index === currentIndex;
-  const Icon = step.icon;
-  return (
-    <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <div style={{
-          width: 44, height: 44, borderRadius: "50%",
-          background: isDone ? "var(--primary)" : "var(--border)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          transition: "all 0.4s ease",
-          boxShadow: isActive ? "0 0 0 6px rgba(26,26,26,0.1)" : "none",
-          animation: isActive ? "pulse 2s infinite" : "none",
-        }}>
-          <Icon size={20} color={isDone ? "white" : "var(--text-muted)"} />
-        </div>
-        {index < ORDER_STATUSES.length - 1 && (
-          <div style={{ width: 2, height: 36, background: index < currentIndex ? "var(--primary)" : "var(--border)", marginTop: 4, transition: "background 0.4s ease" }} />
-        )}
-      </div>
-      <div style={{ paddingTop: 10, flex: 1 }}>
-        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: isDone ? 700 : 500, fontSize: 15, color: isDone ? "var(--primary)" : "var(--text-secondary)" }}>
-          {step.label}
-        </p>
-        {isActive && <p style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2 }}>{step.desc}</p>}
-      </div>
-      {isActive && (
-        <div style={{ paddingTop: 14 }}>
-          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--accent)", animation: "pulse-dot 1.2s infinite" }} />
-        </div>
-      )}
-    </div>
-  );
-}
+
 
 export default function TrackingPage(props: { params: Promise<{ restaurantSlug: string; orderId: string }> }) {
   const params = use(props.params);
@@ -176,20 +142,45 @@ export default function TrackingPage(props: { params: Promise<{ restaurantSlug: 
           </div>
         </div>
 
-        {/* Status Steps */}
-        {!isCancelled ? (
-          <div style={{ background: "var(--surface)", borderRadius: "var(--radius)", padding: 20, marginBottom: 16 }}>
-            <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 16, fontWeight: 700, marginBottom: 20 }}>Status Pesanan</h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-              {ORDER_STATUSES.map((step, i) => (
-                <StatusStep key={step.key} step={step} index={i} currentIndex={currentIndex} />
-              ))}
+        {/* Simple Status Card */}
+        {!isCancelled ? (() => {
+          const currentStep = ORDER_STATUSES[Math.min(currentIndex, ORDER_STATUSES.length - 1)];
+          const Icon = currentStep.icon;
+          return (
+            <div style={{ 
+              background: "var(--surface)", 
+              borderRadius: "var(--radius)", 
+              padding: 24, 
+              marginBottom: 16, 
+              textAlign: "center", 
+              display: "flex", 
+              flexDirection: "column", 
+              alignItems: "center", 
+              justifyContent: "center", 
+              border: "1px solid var(--border)", 
+              boxShadow: "0 4px 20px rgba(0,0,0,0.02)" 
+            }}>
+              <div style={{
+                width: 72, height: 72, borderRadius: "50%",
+                background: "var(--primary)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                marginBottom: 16,
+                boxShadow: "0 0 0 8px rgba(26,26,26,0.05)",
+                animation: "pulse 2s infinite",
+              }}>
+                <Icon size={32} color="white" />
+              </div>
+              <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 22, fontWeight: 800, marginBottom: 8, color: "var(--text-primary)" }}>
+                {currentStep.label}
+              </h2>
+              <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>{currentStep.desc}</p>
             </div>
-          </div>
-        ) : (
-          <div style={{ background: "#FEF2F2", borderRadius: "var(--radius)", padding: 20, marginBottom: 16, textAlign: "center" }}>
+          );
+        })() : (
+          <div style={{ background: "#FEF2F2", borderRadius: "var(--radius)", padding: 20, marginBottom: 16, textAlign: "center", border: "1px solid #DC2626" }}>
             <div style={{ fontSize: 48, marginBottom: 12 }}>❌</div>
             <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, marginBottom: 8, color: "#DC2626" }}>Pesanan Dibatalkan</h2>
+            <p style={{ color: "#DC2626", fontSize: 14 }}>Mohon maaf, pesanan Anda telah dibatalkan oleh restoran.</p>
           </div>
         )}
 
