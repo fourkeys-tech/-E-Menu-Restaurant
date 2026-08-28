@@ -41,6 +41,7 @@ app.use(cors({
   origin: [
     process.env.FRONTEND_CUSTOMER_URL || 'http://localhost:3000',
     process.env.FRONTEND_ADMIN_URL || 'http://localhost:3002',
+    'https://e-menu-apss-web-admin.vercel.app',
   ],
   credentials: true,
 }));
