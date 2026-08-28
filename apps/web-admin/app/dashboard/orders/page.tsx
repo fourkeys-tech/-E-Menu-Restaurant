@@ -79,14 +79,17 @@ export default function OrdersPage() {
   useEffect(() => {
     loadOrders();
     // Real-time
-    const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001");
-    socketRef.current = socket;
-    socket.on("connect", () => {
-      if (user?.restaurant?.id) socket.emit("join:restaurant", user.restaurant.id);
-    });
-    socket.on("order:new", () => loadOrders());
-    socket.on("order:status_updated", () => loadOrders());
-    return () => { socket.disconnect(); };
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
+    if (socketUrl) {
+      const socket = io(socketUrl);
+      socketRef.current = socket as any;
+      socket.on("connect", () => {
+        if (user?.restaurant?.id) socket.emit("join:restaurant", user.restaurant.id);
+      });
+      socket.on("order:new", () => loadOrders());
+      socket.on("order:status_updated", () => loadOrders());
+      return () => { socket.disconnect(); };
+    }
   }, [statusFilter, page, limit]);
 
   const updateStatus = async (orderId: string, status: string) => {

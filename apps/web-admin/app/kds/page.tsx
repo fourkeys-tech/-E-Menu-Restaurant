@@ -158,23 +158,26 @@ export default function KdsPage() {
   useEffect(() => {
     loadOrders();
 
-    const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001");
-    socketRef.current = socket;
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
+    if (socketUrl) {
+      const socket = io(socketUrl);
+      socketRef.current = socket as any;
 
-    socket.on("connect", () => {
-      if (user?.restaurant?.id) socket.emit("join:restaurant", user.restaurant.id);
-    });
+      socket.on("connect", () => {
+        if (user?.restaurant?.id) socket.emit("join:restaurant", user.restaurant.id);
+      });
 
-    socket.on("order:new", (order: any) => {
-      loadOrders();
-      playNotification();
-      setNewOrderAlert(true);
-      setTimeout(() => setNewOrderAlert(false), 3000);
-    });
+      socket.on("order:new", (order: any) => {
+        loadOrders();
+        playNotification();
+        setNewOrderAlert(true);
+        setTimeout(() => setNewOrderAlert(false), 3000);
+      });
 
-    socket.on("order:status_updated", () => loadOrders());
+      socket.on("order:status_updated", () => loadOrders());
 
-    return () => { socket.disconnect(); };
+      return () => { socket.disconnect(); };
+    }
   }, []);
 
   const updateStatus = async (orderId: string, status: string) => {
