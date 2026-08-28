@@ -97,6 +97,12 @@ export default function TrackingPage(props: { params: Promise<{ restaurantSlug: 
       });
 
       return () => { socket.disconnect(); };
+    } else {
+      // Fallback: Poll API every 15 seconds if WebSocket is not available
+      const interval = setInterval(() => {
+        loadOrder();
+      }, 15000);
+      return () => clearInterval(interval);
     }
   }, [orderId]);
 
