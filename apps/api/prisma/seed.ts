@@ -152,6 +152,7 @@ async function main() {
       imageUrl: 'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=800&q=80',
       isBestSeller: false,
       isSpicy: false,
+      isAvailable: false,
     },
     {
       categoryId: createdCategories['makanan-utama'],
@@ -313,7 +314,7 @@ async function main() {
     };
     await prisma.menuItem.upsert({
       where: { restaurantId_slug: { restaurantId: restaurant.id, slug: item.slug } },
-      update: {},
+      update: { ...dataToSave },
       create: { restaurantId: restaurant.id, ...dataToSave },
     });
   }

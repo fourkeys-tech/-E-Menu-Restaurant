@@ -35,7 +35,6 @@ router.get('/:restaurantSlug/menu', async (req: Request, res: Response, next: Ne
       include: {
         menuItems: {
           where: {
-            isAvailable: true,
             ...(search ? { name: { contains: search as string } } : {}),
           },
           orderBy: [{ isBestSeller: 'desc' }, { sortOrder: 'asc' }],
@@ -55,7 +54,6 @@ router.get('/:restaurantSlug/menu', async (req: Request, res: Response, next: Ne
       include: {
         menuItems: {
           where: {
-            isAvailable: true,
             ...(search ? { name: { contains: search as string } } : {}),
           },
           orderBy: [{ isBestSeller: 'desc' }, { sortOrder: 'asc' }],

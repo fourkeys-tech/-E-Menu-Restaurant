@@ -556,7 +556,7 @@ export default function MenuPage(props: { params: Promise<{ restaurantSlug: stri
                 <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text-secondary)", marginLeft: 8 }}>({cat.menuItems.length})</span>
               </h2>
               {cat.menuItems.map((item) => (
-                <div key={item.id} onClick={() => setSelectedItem(item)}>
+                <div key={item.id} onClick={() => { if (item.isAvailable) setSelectedItem(item); }} style={{ cursor: item.isAvailable ? 'pointer' : 'not-allowed' }}>
                   <MenuItemCard
                     item={item}
                     onAdd={(item) => setSelectedItem(item)}
