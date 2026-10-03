@@ -81,7 +81,7 @@ export default function CartPage(props: { params: Promise<{ restaurantSlug: stri
 
   if (items.length === 0) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32, textAlign: "center" }}>
+      <div className="center-screen">
         <ShoppingBag size={64} color="var(--border)" style={{ marginBottom: 20 }} />
         <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 22, marginBottom: 10 }}>Keranjang Kosong</h2>
         <p style={{ color: "var(--text-secondary)", fontSize: 15, marginBottom: 28 }}>Belum ada item yang dipilih.</p>
@@ -91,10 +91,10 @@ export default function CartPage(props: { params: Promise<{ restaurantSlug: stri
   }
 
   return (
-    <div style={{ minHeight: "100vh", paddingBottom: 120 }}>
+    <div className="shell" style={{ paddingBottom: "calc(110px + env(safe-area-inset-bottom))" }}>
       {/* Header */}
-      <div style={{ background: "var(--surface)", padding: "16px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12, position: "sticky", top: 0, zIndex: 30 }}>
-        <Link href={`/menu/${restaurantSlug}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: "50%", border: "1.5px solid var(--border)", color: "var(--primary)" }}>
+      <div className="app-header">
+        <Link href={`/menu/${restaurantSlug}`} className="icon-btn" aria-label="Kembali ke menu">
           <ArrowLeft size={18} />
         </Link>
         <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700 }}>Keranjang</h1>
@@ -102,7 +102,7 @@ export default function CartPage(props: { params: Promise<{ restaurantSlug: stri
       </div>
 
       {/* Items */}
-      <div style={{ padding: "0 16px", background: "var(--surface)" }}>
+      <div style={{ padding: "0 var(--gutter)", background: "var(--surface)" }}>
         {items.map((item) => {
           const vKey = getVariantKey(item.variantSelected);
           return (
@@ -117,7 +117,7 @@ export default function CartPage(props: { params: Promise<{ restaurantSlug: stri
       </div>
 
       {/* Order Notes */}
-      <div style={{ margin: "12px 16px", padding: 16, background: "var(--surface)", borderRadius: "var(--radius)" }}>
+      <div style={{ margin: "12px var(--gutter)", padding: 16, background: "var(--surface)", borderRadius: "var(--radius)" }}>
         <label style={{ fontSize: 14, fontWeight: 600, marginBottom: 8, display: "block", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
           Catatan Pesanan
         </label>
@@ -131,7 +131,7 @@ export default function CartPage(props: { params: Promise<{ restaurantSlug: stri
       </div>
 
       {/* Summary */}
-      <div style={{ margin: "0 16px 12px", padding: 16, background: "var(--surface)", borderRadius: "var(--radius)" }}>
+      <div style={{ margin: "0 var(--gutter) 12px", padding: 16, background: "var(--surface)", borderRadius: "var(--radius)" }}>
         <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 15, fontWeight: 700, marginBottom: 12 }}>Ringkasan Pesanan</h3>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
           <span style={{ fontSize: 14, color: "var(--text-secondary)" }}>Subtotal</span>
@@ -149,7 +149,7 @@ export default function CartPage(props: { params: Promise<{ restaurantSlug: stri
       </div>
 
       {/* Bottom CTA */}
-      <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 480, padding: "12px 16px", background: "white", borderTop: "1px solid var(--border)" }}>
+      <div className="dock">
         <button
           className="btn btn-primary"
           style={{ width: "100%", fontSize: 16 }}

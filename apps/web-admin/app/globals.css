@@ -22,11 +22,14 @@
   --info: #2563EB;
   --info-bg: #DBEAFE;
   --sidebar-w: 240px;
+  --topbar-h: 64px;
+  --gutter: 56px;
   --radius: 12px;
   --radius-sm: 8px;
   --radius-lg: 18px;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.04);
   --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -36,39 +39,102 @@ body {
   background: var(--background);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 h1,h2,h3,h4,h5 { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; }
 a { text-decoration: none; color: inherit; }
+button { font-family: inherit; }
+img, svg, video { max-width: 100%; }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-/* Layout */
-.admin-layout { display: flex; min-height: 100vh; }
+/* ============================================================
+   Layout — collapsible sidebar
+   State lives on .admin-layout[data-sidebar="open|closed"].
+   Desktop (>1024px): closing reclaims the width for main content.
+   Tablet/phone (<=1024px): sidebar is off-canvas and overlays,
+   so it never takes space from the main screen when closed.
+   ============================================================ */
+.admin-layout { display: flex; min-height: 100vh; min-height: 100dvh; }
+
 .sidebar {
   width: var(--sidebar-w);
   background: var(--primary);
   position: fixed;
   top: 0; left: 0; bottom: 0;
   display: flex; flex-direction: column;
-  z-index: 50;
+  z-index: 60;
   overflow: hidden;
+  overscroll-behavior: contain;
+  transition: transform 0.28s var(--ease), width 0.28s var(--ease);
+  will-change: transform;
 }
+
 .main-content {
   margin-left: var(--sidebar-w);
   flex: 1;
+  min-width: 0;              /* prevents wide tables from pushing layout */
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-height: 100dvh;
+  transition: margin-left 0.28s var(--ease);
 }
+
+/* Closed → drawer slides out and leaves the tab order / a11y tree.
+   visibility is delayed so it only hides once the slide has finished. */
+.admin-layout[data-sidebar="closed"] .sidebar {
+  transform: translateX(-100%);
+  visibility: hidden;
+  transition: transform 0.28s var(--ease), visibility 0s linear 0.28s;
+}
+.admin-layout[data-sidebar="closed"] .main-content { margin-left: 0; }
+
+/* Backdrop — only used in off-canvas mode (<=1024px) */
+.sidebar-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  border: none;
+  z-index: 55;
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.25s var(--ease), visibility 0.25s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Top-left trigger that opens/closes the sidebar */
+.sidebar-toggle {
+  position: fixed;
+  top: 12px;
+  left: calc(var(--sidebar-w) + 12px);
+  z-index: 65;
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: left 0.28s var(--ease), background 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.sidebar-toggle:hover { background: var(--surface-2); }
+.sidebar-toggle:active { transform: scale(0.94); }
+.admin-layout[data-sidebar="closed"] .sidebar-toggle { left: 12px; }
+
+/* Close button lives inside the drawer (visible only in off-canvas mode) */
+.sidebar-close { display: none; }
+
+/* Topbar leaves room on the left for the toggle and on the right for the bell */
 .topbar {
-  height: 64px;
+  min-height: var(--topbar-h);
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
-  padding: 0 80px 0 24px;
+  padding: 0 80px 0 var(--gutter);
   position: sticky;
   top: 0; z-index: 30;
   gap: 16px;
@@ -77,6 +143,7 @@ a { text-decoration: none; color: inherit; }
 
 /* Sidebar nav */
 .nav-item {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -114,6 +181,8 @@ a { text-decoration: none; color: inherit; }
   cursor: pointer; transition: all 0.2s;
   border: none; outline: none;
   min-height: 38px;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
 }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-primary { background: var(--primary); color: white; }
@@ -144,12 +213,14 @@ a { text-decoration: none; color: inherit; }
   border: 1.5px solid var(--border); font-size: 15px; font-family: inherit;
   background: white; color: var(--text-primary); outline: none; transition: border 0.2s;
   min-height: 48px;
+  appearance: none;
 }
 .input:focus { border-color: var(--primary); }
 .label { font-size: 13px; font-weight: 600; margin-bottom: 5px; display: block; }
+select.input { padding-right: 36px; }
 
 /* Badges */
-.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 100px; font-size: 12px; font-weight: 600; }
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 100px; font-size: 12px; font-weight: 600; white-space: nowrap; }
 .badge-awaiting_payment { background: var(--warning-bg); color: var(--warning); }
 .badge-pending { background: var(--warning-bg); color: var(--warning); }
 .badge-cooking { background: var(--info-bg); color: var(--info); }
@@ -173,9 +244,228 @@ a { text-decoration: none; color: inherit; }
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
 /* Modal overlay */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.modal { background: var(--surface); border-radius: var(--radius-lg); padding: 24px; width: 100%; max-width: 520px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto; }
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45); backdrop-filter: blur(4px);
+  z-index: 100; display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+.modal {
+  background: var(--surface); border-radius: var(--radius-lg); padding: 24px;
+  width: 100%; max-width: 520px; box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  max-height: 90vh; max-height: 90dvh; overflow-y: auto;
+  overscroll-behavior: contain;
+}
 
 /* KDS */
-.kds-column { background: var(--surface-2); border-radius: var(--radius-lg); padding: 12px; min-width: 280px; flex: 1; }
+.kds-column { background: var(--surface-2); border-radius: var(--radius-lg); padding: 12px; min-width: 280px; flex: 1; min-height: calc(100vh - 140px); min-height: calc(100dvh - 140px); }
 .kds-card { background: var(--surface); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; box-shadow: var(--shadow-sm); animation: slideUp 0.3s ease; }
+
+/* Lock page scroll while the drawer overlays content */
+body.sidebar-lock { overflow: hidden; }
+
+/* ------------------------------------------------------------
+   Responsive layout helpers.
+   Several pages hard-code column counts inline; these classes
+   replace them so narrow screens can stack instead of squeeze.
+   ------------------------------------------------------------ */
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* Two-pane layouts: list + side panel / form */
+.split-layout { display: grid; grid-template-columns: minmax(0, 1fr); }
+.split-layout--panel { grid-template-columns: minmax(0, 1fr) 340px; }
+.split-layout--aside { grid-template-columns: 320px minmax(0, 1fr); }
+
+@media (max-width: 1024px) {
+  .split-layout--panel,
+  .split-layout--aside { grid-template-columns: minmax(0, 1fr); }
+  /* A sticky, internally-scrolled panel makes no sense once stacked */
+  .detail-panel { position: static !important; max-height: none !important; overflow-y: visible !important; }
+}
+@media (max-width: 560px) {
+  .grid-2 { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Utility: fills the viewport using dvh so mobile browser toolbars don't clip content */
+.screen-fill { min-height: 100vh; min-height: 100dvh; }
+
+.auth-screen {
+  background: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  padding: calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom));
+}
+.auth-screen > div { width: 100%; max-width: 400px; }
+
+.kds-topbar {
+  background: var(--primary);
+  padding: calc(12px + env(safe-area-inset-top)) 16px 12px;
+  display: flex; align-items: center; gap: 12px;
+  position: sticky; top: 0; z-index: 30;
+  flex-wrap: wrap; row-gap: 8px;
+}
+.kds-board {
+  flex: 1;
+  padding: 16px;
+  display: flex; gap: 14px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+}
+.kds-board .kds-column { scroll-snap-align: start; }
+
+@media (max-width: 640px) {
+  .kds-topbar h1 { font-size: 16px; }
+  .kds-board { padding: 12px; gap: 10px; }
+}
+
+/* Notification bell (fixed to the top-right of the main area) */
+.notif-wrap { position: fixed; top: 12px; right: 24px; z-index: 100; }
+.notif-btn {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  -webkit-tap-highlight-color: transparent;
+}
+.notif-count {
+  position: absolute; top: -2px; right: -2px;
+  background: var(--error); color: white;
+  font-size: 10px; font-weight: 700;
+  width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.notif-panel {
+  position: absolute; top: 48px; right: 0;
+  background: white; width: 320px;
+  max-width: calc(100vw - 24px);
+  max-height: min(400px, 70vh);
+  border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  border: 1px solid var(--border);
+  overflow: hidden; display: flex;
+  flex-direction: column;
+  animation: slideUp 0.2s ease;
+}
+
+/* ============================================================
+   TABLET — 1024px and below: sidebar becomes an off-canvas drawer
+   ============================================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: min(288px, 84vw);
+    transform: translateX(-100%);
+    box-shadow: 6px 0 28px rgba(0,0,0,0.28);
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  /* Main content always uses the full screen in this mode */
+  .main-content,
+  .admin-layout[data-sidebar="closed"] .main-content { margin-left: 0; }
+
+  .admin-layout[data-sidebar="open"] .sidebar { transform: translateX(0); }
+  .admin-layout[data-sidebar="open"] .sidebar-backdrop { opacity: 1; visibility: visible; }
+
+  .sidebar-toggle { left: 12px; }
+  .admin-layout[data-sidebar="open"] .sidebar-toggle { display: none; }
+
+  /* The drawer owns the screen while open — keep the bell out of the scrim */
+  .admin-layout[data-sidebar="open"] .notif-wrap { opacity: 0; pointer-events: none; }
+  .notif-wrap { transition: opacity 0.2s var(--ease); }
+
+  /* In-drawer close button replaces the floating trigger */
+  .sidebar-close {
+    display: flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; flex-shrink: 0;
+    margin-right: 2px;
+    border: none; border-radius: 10px;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.8);
+    cursor: pointer;
+  }
+  .sidebar-close:hover { background: rgba(255,255,255,0.16); color: white; }
+
+  .topbar { padding-left: 64px; }
+  .page-content { padding: 20px 16px; }
+
+  /* Data-dense tables scroll inside their card instead of breaking the layout */
+  .card:has(.data-table) { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .data-table { min-width: 100%; }
+
+  /* 16px stops iOS/Android from zooming when a field is focused */
+  .input, textarea.input, select.input { font-size: 16px; }
+}
+
+/* ============================================================
+   PHONE — 640px and below
+   ============================================================ */
+@media (max-width: 640px) {
+  :root { --topbar-h: 56px; --gutter: 56px; }
+
+  .topbar {
+    min-height: var(--topbar-h);
+    padding: 10px 64px 10px 56px;
+    flex-wrap: wrap;
+    gap: 8px;
+    row-gap: 10px;
+  }
+  .topbar .btn { padding: 7px 12px; font-size: 13px; min-height: 36px; }
+  .page-content { padding: 14px 12px 20px; }
+
+  .stat-value { font-size: 24px; }
+  .stat-card { padding: 16px; }
+
+  /* Comfortable touch targets */
+  .btn { min-height: 44px; }
+  .btn-sm { min-height: 38px; padding: 7px 12px; }
+  .btn-icon { min-width: 44px; min-height: 44px; }
+
+  .data-table th, .data-table td { padding: 11px 12px; font-size: 13px; }
+  .data-table td { white-space: nowrap; }
+  .data-table th { white-space: nowrap; }
+
+  /* Forms become bottom sheets so they are reachable with one hand.
+     Most dialogs here are rendered as a plain .card inside .modal-overlay. */
+  .modal-overlay { padding: 0; align-items: flex-end; justify-content: center; }
+  .modal {
+    max-width: 100%;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    max-height: 92vh; max-height: 92dvh;
+    padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+    animation: slideUp 0.28s var(--ease);
+  }
+  .modal-overlay > .card {
+    width: 100%;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    max-height: 92vh; max-height: 92dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    /* beats the inline padding each dialog sets, so the home bar never overlaps it */
+    padding: 20px 16px calc(20px + env(safe-area-inset-bottom)) !important;
+    animation: slideUp 0.28s var(--ease);
+  }
+
+  .kds-column { min-width: 250px; }
+
+  .notif-wrap { top: 8px; right: 10px; }
+  .notif-btn { width: 44px; height: 44px; }
+  .notif-panel { top: 52px; }
+}
+
+/* Keep the app usable when a phone is held sideways */
+@media (max-width: 900px) and (orientation: landscape) {
+  .modal { max-height: 84vh; }
+}
+
+/* Respect users who disable animations */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

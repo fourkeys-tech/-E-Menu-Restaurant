@@ -190,9 +190,9 @@ export default function KdsPage() {
   const getColumnOrders = (status: string) => orders.filter((o) => o.status === status);
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--background)", display: "flex", flexDirection: "column" }}>
+    <div className="screen-fill" style={{ background: "var(--background)", display: "flex", flexDirection: "column" }}>
       {/* KDS Topbar */}
-      <div style={{ background: "var(--primary)", padding: "12px 20px", display: "flex", alignItems: "center", gap: 16, position: "sticky", top: 0, zIndex: 30 }}>
+      <div className="kds-topbar">
         <Link href="/dashboard" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: 8, background: "rgba(255,255,255,0.1)", color: "white" }}>
           <ArrowLeft size={18} />
         </Link>
@@ -212,11 +212,11 @@ export default function KdsPage() {
       </div>
 
       {/* Kanban Board */}
-      <div style={{ flex: 1, padding: 16, display: "flex", gap: 14, overflowX: "auto" }}>
+      <div className="kds-board">
         {COLUMNS.map((col) => {
           const colOrders = getColumnOrders(col.key);
           return (
-            <div key={col.key} className="kds-column" style={{ background: col.bg, minHeight: "calc(100vh - 120px)" }}>
+            <div key={col.key} className="kds-column" style={{ background: col.bg }}>
               {/* Column Header */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, padding: "6px 8px" }}>
                 <div>

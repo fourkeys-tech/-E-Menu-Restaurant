@@ -269,7 +269,7 @@ export default function InventoryPage() {
                   <label className="label">Nama Bahan/Barang</label>
                   <input type="text" className="input" placeholder="Misal: Beras Premium" value={itemForm.name} onChange={e => setItemForm({...itemForm, name: e.target.value})} required />
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div className="grid-2" style={{ gap: 12 }}>
                   <div>
                     <label className="label">Satuan</label>
                     <input type="text" className="input" placeholder="Kg, Ltr, Pcs..." value={itemForm.unit} onChange={e => setItemForm({...itemForm, unit: e.target.value})} required />

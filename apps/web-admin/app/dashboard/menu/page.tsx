@@ -47,7 +47,7 @@ function MenuItemModal({ item, categories, onClose, onSave }: { item: Partial<Me
         {error && <div style={{ padding: "10px 14px", background: "var(--error-bg)", color: "var(--error)", borderRadius: "var(--radius-sm)", marginBottom: 14, fontSize: 14 }}>{error}</div>}
 
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div className="grid-2" style={{ gap: 12 }}>
             <div style={{ gridColumn: "1/-1" }}>
               <label className="label">Nama Menu *</label>
               <input className="input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required placeholder="Contoh: Nasi Goreng Kampung" />

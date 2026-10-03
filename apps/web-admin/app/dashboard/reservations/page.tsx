@@ -297,7 +297,7 @@ export default function ReservationsPage() {
                   <label className="label">No. Telepon / WA (Opsional)</label>
                   <input type="tel" className="input" placeholder="08..." value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div className="grid-2" style={{ gap: 12 }}>
                   <div>
                     <label className="label">Tanggal</label>
                     <input type="date" className="input" value={form.date} onChange={e => setForm({...form, date: e.target.value})} required />
@@ -307,7 +307,7 @@ export default function ReservationsPage() {
                     <input type="time" className="input" value={form.time} onChange={e => setForm({...form, time: e.target.value})} required />
                   </div>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div className="grid-2" style={{ gap: 12 }}>
                   <div>
                     <label className="label">Plot Meja (Opsional)</label>
                     <select className="input" value={form.tableId} onChange={e => setForm({...form, tableId: e.target.value})}>

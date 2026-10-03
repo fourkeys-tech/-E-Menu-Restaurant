@@ -236,7 +236,7 @@ export default function PromotionsPage() {
                   <label className="label">Kode Kupon</label>
                   <input type="text" className="input" placeholder="Contoh: HEMAT20" value={form.code || ""} onChange={e => setForm({...form, code: e.target.value.toUpperCase()})} required style={{ textTransform: "uppercase", fontWeight: 700, letterSpacing: 1 }} />
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div className="grid-2" style={{ gap: 12 }}>
                   <div>
                     <label className="label">Tipe Diskon</label>
                     <select className="input" value={form.discountType} onChange={e => setForm({...form, discountType: e.target.value})}>
@@ -249,7 +249,7 @@ export default function PromotionsPage() {
                     <input type="number" className="input" min="0" step={form.discountType === 'PERCENT' ? "1" : "1000"} value={form.discountValue || ""} onChange={e => setForm({...form, discountValue: Number(e.target.value)})} required placeholder={form.discountType === 'PERCENT' ? "Misal: 10" : "Misal: 15000"} />
                   </div>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div className="grid-2" style={{ gap: 12 }}>
                   <div>
                     <label className="label">Berlaku Mulai</label>
                     <input type="date" className="input" value={form.startDate} onChange={e => setForm({...form, startDate: e.target.value})} />

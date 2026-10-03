@@ -5,7 +5,8 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
   LayoutDashboard, UtensilsCrossed, ClipboardList, Table2,
-  BarChart3, LogOut, ChefHat, Settings, Users, Wallet, Bookmark, ChevronDown, ChevronRight, PackageSearch, Tag
+  BarChart3, LogOut, ChefHat, Settings, Users, Wallet, Bookmark, ChevronDown, ChevronRight, PackageSearch, Tag,
+  Menu, X
 } from "lucide-react";
 import { useAuthStore } from "@/lib/auth";
 import NotificationBell from "@/components/NotificationBell";
@@ -61,15 +62,37 @@ const NAV_GROUPS = [
   }
 ];
 
+/** Sidebar preference is remembered per device profile. */
+const SIDEBAR_PREF_KEY = "smartmenu.sidebar";
+/** At or below this width the sidebar becomes an off-canvas drawer. */
+const DRAWER_QUERY = "(max-width: 1024px)";
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { user, token, logout, shiftActive } = useAuthStore();
   const [isHydrated, setIsHydrated] = useState(false);
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({ "Pengeluaran": pathname.startsWith("/dashboard/expenses") });
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isDrawer, setIsDrawer] = useState(false);
 
   useEffect(() => {
     setIsHydrated(true);
+
+    const mq = window.matchMedia(DRAWER_QUERY);
+    const preferredOpen = () =>
+      window.localStorage.getItem(SIDEBAR_PREF_KEY) === "closed" ? false : true;
+
+    setIsDrawer(mq.matches);
+    // On phones/tablets the drawer starts closed so the main screen is fully visible.
+    setSidebarOpen(mq.matches ? false : preferredOpen());
+
+    const onChange = (event: MediaQueryListEvent) => {
+      setIsDrawer(event.matches);
+      setSidebarOpen(event.matches ? false : preferredOpen());
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
   }, []);
 
   useEffect(() => {
@@ -80,9 +103,37 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }, [token, isHydrated, user, pathname, router]);
 
-  const showShiftWarning = user?.role === "kasir" && !shiftActive && pathname !== "/dashboard" && pathname !== "/dashboard/settings";
+  // Navigating while the drawer overlays the screen should get out of the way.
+  useEffect(() => {
+    if (isDrawer) setSidebarOpen(false);
+  }, [pathname, isDrawer]);
 
-  if (!isHydrated || !token || !user) return null;
+  // Escape closes it; while open on a small screen the page behind cannot scroll.
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSidebarOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    if (isDrawer) document.body.classList.add("sidebar-lock");
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.classList.remove("sidebar-lock");
+    };
+  }, [sidebarOpen, isDrawer]);
+
+  const toggleSidebar = () => {
+    setSidebarOpen((prev) => {
+      const next = !prev;
+      // Only the inline desktop drawer is a lasting preference.
+      if (!window.matchMedia(DRAWER_QUERY).matches) {
+        window.localStorage.setItem(SIDEBAR_PREF_KEY, next ? "open" : "closed");
+      }
+      return next;
+    });
+  };
+
+  const showShiftWarning = user?.role === "kasir" && !shiftActive && pathname !== "/dashboard" && pathname !== "/dashboard/settings";
 
   if (!isHydrated || !token || !user) return null;
 
@@ -92,19 +143,39 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   return (
-    <div className="admin-layout">
+    <div className="admin-layout" data-sidebar={sidebarOpen ? "open" : "closed"}>
+      {/* Trigger: sits at the top-left of the screen and never covers the sidebar itself */}
+      <button
+        type="button"
+        className="sidebar-toggle"
+        onClick={toggleSidebar}
+        aria-controls="admin-sidebar"
+        aria-expanded={sidebarOpen}
+        aria-label={sidebarOpen ? "Tutup menu" : "Buka menu"}
+      >
+        <Menu size={20} />
+      </button>
+
       {/* Sidebar */}
-      <aside className="sidebar">
+      <aside className="sidebar" id="admin-sidebar">
         {/* Logo */}
-        <div style={{ padding: "20px 16px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+        <div style={{ padding: "20px 12px 20px 16px", borderBottom: "1px solid rgba(255,255,255,0.08)", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <UtensilsCrossed size={20} color="white" />
             </div>
-            <div>
+            <div style={{ minWidth: 0, flex: 1 }}>
               <p style={{ color: "white", fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 15 }}>SmartMenu</p>
-              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>{user.restaurant?.name || "Admin"}</p>
+              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.restaurant?.name || "Admin"}</p>
             </div>
+            <button
+              type="button"
+              className="sidebar-close"
+              onClick={toggleSidebar}
+              aria-label="Tutup menu"
+            >
+              <X size={18} />
+            </button>
           </div>
         </div>
 
@@ -187,7 +258,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </nav>
 
         {/* User footer */}
-        <div style={{ padding: "12px 8px", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+        <div style={{ padding: "12px 8px", borderTop: "1px solid rgba(255,255,255,0.08)", flexShrink: 0 }}>
           <div style={{ padding: "10px 12px", marginBottom: 4 }}>
             <p style={{ color: "white", fontWeight: 600, fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.name}</p>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, textTransform: "capitalize" }}>{user.role}</p>
@@ -198,11 +269,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
+      {/* Scrim that dismisses the drawer on tablet/phone */}
+      <button
+        type="button"
+        className="sidebar-backdrop"
+        onClick={() => setSidebarOpen(false)}
+        aria-label="Tutup menu"
+        tabIndex={-1}
+      />
+
       {/* Main */}
       <main className="main-content" style={{ position: "relative" }}>
         <NotificationBell />
         {showShiftWarning ? (
-          <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
             <div className="card" style={{ width: "100%", maxWidth: 400, padding: 32, textAlign: "center", animation: "slideUp 0.3s ease" }}>
               <div style={{ width: 64, height: 64, borderRadius: 32, background: "#FEF2F2", color: "#EF4444", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
                 <Wallet size={32} />

@@ -107,7 +107,7 @@ export default function TablesPage() {
       </div>
 
       <div className="page-content">
-        <div style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: 20, alignItems: "start" }}>
+        <div className="split-layout split-layout--aside" style={{ gap: 20, alignItems: "start" }}>
           {/* Add Table Form */}
           <div className="card" style={{ padding: 20 }}>
             <h2 style={{ fontSize: 16, marginBottom: 16 }}>Tambah Meja Baru</h2>

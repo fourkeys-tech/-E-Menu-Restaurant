@@ -167,7 +167,7 @@ export default function OrdersPage() {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: selectedOrder ? "1fr 340px" : "1fr", gap: 16 }}>
+        <div className={`split-layout ${selectedOrder ? "split-layout--panel" : ""}`} style={{ gap: 16 }}>
           {/* Orders Table */}
           <div className="card" style={{ overflow: "hidden" }}>
             {loading ? (
@@ -236,7 +236,7 @@ export default function OrdersPage() {
 
           {/* Order Detail Panel */}
           {selectedOrder && (
-            <div className="card animate-slide-up" style={{ padding: 18, alignSelf: "start", position: "sticky", top: 80, maxHeight: "calc(100vh - 100px)", overflowY: "auto" }}>
+            <div className="card animate-slide-up detail-panel" style={{ padding: 18, alignSelf: "start", position: "sticky", top: 80, maxHeight: "calc(100vh - 100px)", overflowY: "auto" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                 <h3 style={{ fontSize: 16 }}>{selectedOrder.orderNumber}</h3>
                 <button onClick={() => setSelectedOrder(null)} className="btn btn-icon btn-outline"><XCircle size={16} /></button>

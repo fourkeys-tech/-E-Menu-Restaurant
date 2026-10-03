@@ -68,7 +68,7 @@ npx prisma generate
 
 # Menyuntikkan data sampel dasar (Menu, Meja, dan Akun Demo)
 npm run db:seed
-```
+```npx prisma db push
 
 ### 4. Menjalankan Server Utama
 Kembali ke akar (*root*) proyek dan jalankan ketiganya secara bersamaan:

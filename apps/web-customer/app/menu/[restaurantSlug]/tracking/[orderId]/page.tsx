@@ -78,7 +78,7 @@ export default function TrackingPage(props: { params: Promise<{ restaurantSlug: 
 
   if (loading) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div className="center-screen" style={{ justifyContent: "center", padding: 0 }}>
         <Loader2 size={32} color="var(--primary)" style={{ animation: "spin 1s linear infinite" }} />
         <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
       </div>
@@ -87,7 +87,7 @@ export default function TrackingPage(props: { params: Promise<{ restaurantSlug: 
 
   if (!order) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 32, textAlign: "center" }}>
+      <div className="center-screen">
         <div style={{ fontSize: 52, marginBottom: 16 }}>😕</div>
         <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 20, marginBottom: 8 }}>Pesanan Tidak Ditemukan</h2>
         <Link href={`/menu/${restaurantSlug}`} className="btn btn-primary" style={{ marginTop: 16 }}>Kembali ke Menu</Link>
@@ -96,9 +96,9 @@ export default function TrackingPage(props: { params: Promise<{ restaurantSlug: 
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--background)", paddingBottom: 40 }}>
+    <div className="shell shell--wide" style={{ background: "var(--background)", paddingBottom: "calc(40px + env(safe-area-inset-bottom))" }}>
       {/* Header */}
-      <div style={{ background: order.restaurant.primaryColor || "#1A1A1A", padding: "20px 16px 24px" }}>
+      <div className="page-header" style={{ background: order.restaurant.primaryColor || "#1A1A1A" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
           <h1 style={{ color: "white", fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700 }}>
             {order.restaurant.name}
@@ -118,7 +118,7 @@ export default function TrackingPage(props: { params: Promise<{ restaurantSlug: 
         </div>
       </div>
 
-      <div style={{ padding: "16px" }}>
+      <div className="page-body" style={{ padding: "16px var(--gutter)" }}>
         {/* Payment Status */}
         <div style={{
           padding: "12px 16px",

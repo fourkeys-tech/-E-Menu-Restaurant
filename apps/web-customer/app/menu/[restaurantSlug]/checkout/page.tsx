@@ -70,7 +70,7 @@ export default function CheckoutPage(props: { params: Promise<{ restaurantSlug: 
   };
 
   return (
-    <div style={{ minHeight: "100vh", paddingBottom: 120 }}>
+    <div className="shell" style={{ paddingBottom: "calc(110px + env(safe-area-inset-bottom))" }}>
       {/* Midtrans Snap script */}
       <script
         src={`https://app.sandbox.midtrans.com/snap/snap.js`}
@@ -79,14 +79,14 @@ export default function CheckoutPage(props: { params: Promise<{ restaurantSlug: 
       />
 
       {/* Header */}
-      <div style={{ background: "var(--surface)", padding: "16px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12, position: "sticky", top: 0, zIndex: 30 }}>
-        <Link href={`/menu/${restaurantSlug}/cart`} style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: "50%", border: "1.5px solid var(--border)", color: "var(--primary)" }}>
+      <div className="app-header">
+        <Link href={`/menu/${restaurantSlug}/cart`} className="icon-btn" aria-label="Kembali ke keranjang">
           <ArrowLeft size={18} />
         </Link>
         <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700 }}>Pilih Pembayaran</h1>
       </div>
 
-      <div style={{ padding: 16 }}>
+      <div className="page-body">
         {/* Order summary mini */}
         <div style={{ padding: "14px 16px", background: "var(--surface)", borderRadius: "var(--radius)", marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
@@ -102,7 +102,7 @@ export default function CheckoutPage(props: { params: Promise<{ restaurantSlug: 
         {/* Data Pelanggan */}
         <div style={{ marginBottom: 24 }}>
           <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 16, fontWeight: 700, marginBottom: 14 }}>Data Pemesan</h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div className="form-stack">
             <div>
               <label style={{ fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6, display: "block" }}>Nama Panggilan (Opsional)</label>
               <input 
@@ -224,7 +224,7 @@ export default function CheckoutPage(props: { params: Promise<{ restaurantSlug: 
       </div>
 
       {/* Bottom CTA */}
-      <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 480, padding: "12px 16px", background: "white", borderTop: "1px solid var(--border)" }}>
+      <div className="dock">
         <button
           className="btn btn-primary"
           style={{ width: "100%", fontSize: 16, opacity: !paymentMethod || loading ? 0.5 : 1 }}

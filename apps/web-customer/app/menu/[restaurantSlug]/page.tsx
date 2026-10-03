@@ -11,8 +11,8 @@ import { useCartStore } from "@/lib/store/cart";
 // ===================== Skeleton Components =====================
 function SkeletonCard() {
   return (
-    <div className="card overflow-hidden" style={{ display: "flex", gap: 12, padding: 12, marginBottom: 12 }}>
-      <div className="skeleton" style={{ width: 100, height: 100, borderRadius: 12, flexShrink: 0 }} />
+    <div className="card menu-card" style={{ display: "flex", gap: 12, padding: 12 }}>
+      <div className="skeleton menu-thumb" style={{ borderRadius: 12 }} />
       <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
         <div className="skeleton" style={{ height: 16, width: "70%" }} />
         <div className="skeleton" style={{ height: 12, width: "90%" }} />
@@ -28,7 +28,7 @@ function SkeletonCard() {
 
 function SkeletonHeader() {
   return (
-    <div style={{ background: "#1A1A1A", padding: "20px 16px 16px" }}>
+    <div className="menu-header" style={{ background: "#1A1A1A" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
         <div className="skeleton" style={{ width: 44, height: 44, borderRadius: "50%", background: "#333" }} />
         <div style={{ flex: 1 }}>
@@ -55,25 +55,24 @@ function MenuItemCard({ item, onAdd }: { item: MenuItem; onAdd: (item: MenuItem)
 
   return (
     <div
-      className="card animate-fade-in"
+      className="card animate-fade-in menu-card"
       style={{
         display: "flex",
         gap: 12,
         padding: 12,
-        marginBottom: 10,
         opacity: item.isAvailable ? 1 : 0.6,
         position: "relative",
       }}
     >
       {/* Image */}
-      <div style={{ width: 100, height: 100, borderRadius: 12, overflow: "hidden", flexShrink: 0, background: "#f0f0ec", position: "relative" }}>
+      <div className="menu-thumb">
         {!imgError && item.imageUrl ? (
           <Image
             src={item.imageUrl}
             alt={item.name}
             fill
             style={{ objectFit: "cover" }}
-            sizes="100px"
+            sizes="(min-width: 900px) 30vw, 112px"
             onError={() => setImgError(true)}
           />
         ) : (
@@ -156,20 +155,19 @@ function ItemModal({ item, onClose, onAdd }: { item: MenuItem; onClose: () => vo
   const totalPrice = (item.price + totalAdditional) * quantity;
 
   return (
-    <div
-      style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}
-      onClick={onClose}
-    >
+    <div className="sheet-overlay animate-fade-in" onClick={onClose}>
       <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }} />
       <div
-        className="animate-slide-up"
-        style={{ position: "relative", background: "var(--surface)", borderRadius: "20px 20px 0 0", maxHeight: "85vh", overflow: "hidden", display: "flex", flexDirection: "column" }}
+        className="sheet animate-slide-up"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label={item.name}
       >
         {/* Image */}
-        <div style={{ position: "relative", height: 220, background: "#f0f0ec", flexShrink: 0 }}>
+        <div style={{ position: "relative", height: "clamp(160px, 34vh, 240px)", background: "#f0f0ec", flexShrink: 0 }}>
           {item.imageUrl ? (
-            <Image src={item.imageUrl} alt={item.name} fill style={{ objectFit: "cover" }} sizes="480px" />
+            <Image src={item.imageUrl} alt={item.name} fill style={{ objectFit: "cover" }} sizes="(min-width: 600px) 560px, 100vw" />
           ) : (
             <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 60 }}>🍽️</div>
           )}
@@ -183,7 +181,7 @@ function ItemModal({ item, onClose, onAdd }: { item: MenuItem; onClose: () => vo
         </div>
 
         {/* Content */}
-        <div style={{ padding: "16px 16px 0", overflowY: "auto", flex: 1 }}>
+        <div style={{ padding: "16px var(--gutter) 0", overflowY: "auto", flex: 1, minHeight: 0 }}>
           <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
             {item.isBestSeller && <span className="badge badge-bestseller"><Star size={10} fill="currentColor" /> Best Seller</span>}
             {item.variants && item.variants.length > 0 && <span className="badge" style={{ background: "var(--info-bg)", color: "var(--info)" }}>+ {item.variants.length} Varian</span>}
@@ -236,7 +234,7 @@ function ItemModal({ item, onClose, onAdd }: { item: MenuItem; onClose: () => vo
         </div>
 
         {/* Bottom bar */}
-        <div style={{ padding: 16, borderTop: "1px solid var(--border)", background: "var(--surface)", flexShrink: 0 }}>
+        <div style={{ padding: "16px var(--gutter) calc(16px + env(safe-area-inset-bottom))", borderTop: "1px solid var(--border)", background: "var(--surface)", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <button onClick={() => setQuantity((q) => Math.max(1, q - 1))} style={{ width: 34, height: 34, borderRadius: "50%", border: "1.5px solid var(--border)", background: "white", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -274,8 +272,8 @@ function FloatingCartBar({ restaurantSlug }: { restaurantSlug: string }) {
 
   return (
     <div
-      className="animate-slide-up"
-      style={{ position: "fixed", bottom: 20, left: 0, right: 0, display: "flex", justifyContent: "center", zIndex: 50, pointerEvents: "none" }}
+      className="animate-slide-up floating-dock"
+      style={{ pointerEvents: "none" }}
     >
       <Link
         href={`/menu/${restaurantSlug}/cart`}
@@ -289,8 +287,7 @@ function FloatingCartBar({ restaurantSlug }: { restaurantSlug: string }) {
           textDecoration: "none",
           boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
           color: "white",
-          width: "calc(100% - 32px)",
-          maxWidth: 448,
+          width: "100%",
           pointerEvents: "auto",
         }}
       >
@@ -333,6 +330,8 @@ export default function MenuPage(props: { params: Promise<{ restaurantSlug: stri
 
   const { addItem, setTable, setRestaurant, tableId: currentTableId, clearCart } = useCartStore();
   const tabsRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (tableId) {
@@ -379,13 +378,18 @@ export default function MenuPage(props: { params: Promise<{ restaurantSlug: stri
 
   const handleTabClick = (slug: string) => {
     setActiveCategory(slug);
-    
+
     // Scroll tab into view
     const tabEl = tabsRef.current?.querySelector(`[data-slug="${slug}"]`) as HTMLElement;
     tabEl?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-    
-    // Scroll to top of the menu items
-    window.scrollTo({ top: 180, behavior: "smooth" });
+
+    // Bring the list just below the sticky header (its height changes with the
+    // viewport, so measure it instead of hard-coding an offset).
+    const listTop = listRef.current?.offsetTop ?? 0;
+    const headerHeight = headerRef.current?.offsetHeight ?? 0;
+    if (listTop || headerHeight) {
+      window.scrollTo({ top: Math.max(0, listTop - headerHeight), behavior: "smooth" });
+    }
   };
 
   const handleAddItem = (item: MenuItem, quantity = 1, notes = "", variantSelected?: any) => {
@@ -405,10 +409,12 @@ export default function MenuPage(props: { params: Promise<{ restaurantSlug: stri
 
   if (loading) {
     return (
-      <div>
+      <div className="shell shell--wide">
         <SkeletonHeader />
-        <div style={{ padding: "16px 16px 0" }}>
-          {[1, 2, 3, 4].map((i) => <SkeletonCard key={i} />)}
+        <div className="menu-body" style={{ paddingTop: 16 }}>
+          <div className="menu-grid">
+            {[1, 2, 3, 4, 5, 6].map((i) => <SkeletonCard key={i} />)}
+          </div>
         </div>
       </div>
     );
@@ -416,12 +422,12 @@ export default function MenuPage(props: { params: Promise<{ restaurantSlug: stri
 
   if (isTableOccupied) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", padding: 24, textAlign: "center", background: "#111", color: "white" }}>
+      <div className="center-screen" style={{ background: "#111", color: "white" }}>
         <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(239,68,64,0.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
           <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         </div>
         <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>Meja Sedang Digunakan</h2>
-        <p style={{ color: "rgba(255,255,255,0.7)", lineHeight: 1.5, marginBottom: 32 }}>
+        <p style={{ color: "rgba(255,255,255,0.7)", lineHeight: 1.5, marginBottom: 32, maxWidth: 460 }}>
           Meja ini masih memiliki pesanan aktif yang belum diselesaikan pembayarannya. <br/><br/>
           Silakan selesaikan pembayaran pesanan sebelumnya di kasir, atau hubungi pelayan jika ini adalah sebuah kesalahan.
         </p>
@@ -431,7 +437,7 @@ export default function MenuPage(props: { params: Promise<{ restaurantSlug: stri
 
   if (error || !data) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "80vh", padding: 32, textAlign: "center" }}>
+      <div className="center-screen" style={{ minHeight: "80vh" }}>
         <div style={{ fontSize: 56, marginBottom: 16 }}>😕</div>
         <h2 style={{ fontSize: 20, marginBottom: 8, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Menu Tidak Ditemukan</h2>
         <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>{error || "Restoran tidak tersedia"}</p>
@@ -440,9 +446,9 @@ export default function MenuPage(props: { params: Promise<{ restaurantSlug: stri
   }
 
   return (
-    <div style={{ paddingBottom: 100 }}>
+    <div className="shell shell--wide" style={{ paddingBottom: "calc(112px + env(safe-area-inset-bottom))" }}>
       {/* Header */}
-      <div style={{ background: r!.primaryColor || "#1A1A1A", padding: "20px 16px 16px", position: "sticky", top: 0, zIndex: 40 }}>
+      <div ref={headerRef} className="menu-header" style={{ background: r!.primaryColor || "#1A1A1A" }}>
         {/* Restaurant info */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
           <div style={{ width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
@@ -491,25 +497,14 @@ export default function MenuPage(props: { params: Promise<{ restaurantSlug: stri
 
         {/* Category Tabs */}
         {!searchQuery && (
-          <div
-            ref={tabsRef}
-            style={{ display: "flex", gap: 8, overflowX: "auto", paddingTop: 12, scrollbarWidth: "none", msOverflowStyle: "none" }}
-          >
+          <div ref={tabsRef} className="tab-row">
             <button
               data-slug="all"
               onClick={() => handleTabClick("all")}
+              className="tab-pill"
               style={{
-                padding: "6px 16px",
-                borderRadius: 100,
-                border: "none",
                 background: activeCategory === "all" ? (r!.accentColor || "#D9A441") : "rgba(255,255,255,0.12)",
                 color: activeCategory === "all" ? "white" : "rgba(255,255,255,0.7)",
-                fontSize: 13,
-                fontWeight: 600,
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-                transition: "all 0.2s",
               }}
             >
               Semua
@@ -519,18 +514,10 @@ export default function MenuPage(props: { params: Promise<{ restaurantSlug: stri
                 key={cat.id}
                 data-slug={cat.slug}
                 onClick={() => handleTabClick(cat.slug)}
+                className="tab-pill"
                 style={{
-                  padding: "6px 16px",
-                  borderRadius: 100,
-                  border: "none",
                   background: activeCategory === cat.slug ? (r!.accentColor || "#D9A441") : "rgba(255,255,255,0.12)",
                   color: activeCategory === cat.slug ? "white" : "rgba(255,255,255,0.7)",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                  transition: "all 0.2s",
                 }}
               >
                 {cat.name}
@@ -541,7 +528,7 @@ export default function MenuPage(props: { params: Promise<{ restaurantSlug: stri
       </div>
 
       {/* Menu Items */}
-      <div style={{ padding: "12px 16px 0" }}>
+      <div ref={listRef} className="menu-body">
         {filteredCategories.length === 0 ? (
           <div style={{ textAlign: "center", padding: "64px 16px" }}>
             <div style={{ fontSize: 52, marginBottom: 12 }}>🔍</div>
@@ -550,20 +537,22 @@ export default function MenuPage(props: { params: Promise<{ restaurantSlug: stri
           </div>
         ) : (
           filteredCategories.map((cat) => (
-            <div key={cat.id} data-category={cat.slug}>
+            <section key={cat.id} data-category={cat.slug} className="menu-category">
               <h2 style={{ fontSize: 17, fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, marginBottom: 12, marginTop: 16, paddingBottom: 8, borderBottom: "2px solid var(--border)" }}>
                 {cat.name}
                 <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text-secondary)", marginLeft: 8 }}>({cat.menuItems.length})</span>
               </h2>
-              {cat.menuItems.map((item) => (
-                <div key={item.id} onClick={() => { if (item.isAvailable) setSelectedItem(item); }} style={{ cursor: item.isAvailable ? 'pointer' : 'not-allowed' }}>
-                  <MenuItemCard
-                    item={item}
-                    onAdd={(item) => setSelectedItem(item)}
-                  />
-                </div>
-              ))}
-            </div>
+              <div className="menu-grid">
+                {cat.menuItems.map((item) => (
+                  <div key={item.id} onClick={() => { if (item.isAvailable) setSelectedItem(item); }} style={{ cursor: item.isAvailable ? 'pointer' : 'not-allowed', minWidth: 0 }}>
+                    <MenuItemCard
+                      item={item}
+                      onAdd={(item) => setSelectedItem(item)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
           ))
         )}
       </div>
@@ -582,7 +571,7 @@ export default function MenuPage(props: { params: Promise<{ restaurantSlug: stri
 
       {/* Toast */}
       {toast && (
-        <div style={{ position: "fixed", bottom: 100, left: 0, right: 0, display: "flex", justifyContent: "center", zIndex: 200, pointerEvents: "none" }}>
+        <div className="toast-dock">
           <div
             className="animate-slide-up"
             style={{ background: "#1A1A1A", color: "white", padding: "10px 20px", borderRadius: 100, fontSize: 13, fontWeight: 600, whiteSpace: "nowrap", boxShadow: "0 4px 20px rgba(0,0,0,0.25)" }}

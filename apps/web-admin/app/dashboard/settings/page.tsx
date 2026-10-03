@@ -184,7 +184,7 @@ export default function SettingsPage() {
                 </div>
               </div>
               
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 40 }}>
+              <div className="grid-2" style={{ gap: 20, marginBottom: 40 }}>
                 <div>
                   <label className="label">Nama Usaha / Restoran</label>
                   <input type="text" required className="input" value={restaurantForm.name} onChange={e => setRestaurantForm({ ...restaurantForm, name: e.target.value })} />
@@ -213,7 +213,7 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, maxWidth: 600, marginBottom: 40 }}>
+              <div className="grid-2" style={{ gap: 20, maxWidth: 600, marginBottom: 40 }}>
                 <div>
                   <label className="label">Pajak Pertambahan Nilai (PPN)</label>
                   <div style={{ position: "relative" }}>
@@ -239,7 +239,7 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, maxWidth: 600, marginBottom: 20 }}>
+              <div className="grid-2" style={{ gap: 20, maxWidth: 600, marginBottom: 20 }}>
                 <div>
                   <label className="label">Warna Utama (Primary)</label>
                   <div style={{ display: "flex", gap: 8 }}>
